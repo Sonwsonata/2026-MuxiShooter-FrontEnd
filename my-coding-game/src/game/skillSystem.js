@@ -1,24 +1,39 @@
 // src/game/skillSystem.js
-export function applySkills(baseStats, skills) {
-  const stats = { ...baseStats }
+import { SKILL_POOL } from '../config/skillPool'
 
-  skills.forEach(skill => {
-    Object.entries(skill).forEach(([key, value]) => {
-      if (key === 'id') return
+export function getRandomSkills({
+  ownedSkills = {},
+  count = 3
+}) {
+  const candidates = []
 
-      if (typeof value === 'number') {
-        stats[key] = (stats[key] || 0) + value
-      }
+  for (const [category, data] of Object.entries(SKILL_POOL)) {
+    const level = ownedSkills[category] || 0
 
-      if (key === 'doubleCast') {
-        stats.castTimes = (stats.castTimes || 1) + 1
-      }
+    // 决定当前可抽稀有度
+    const tier = getTierByLevel(level)
 
-      if (key === 'rows') {
-        stats.rows = value
-      }
+    const pool = data[tier] || []
+    pool.forEach(skill => {
+      candidates.push({
+        ...skill,
+        category,
+        tier
+      })
     })
-  })
+  }
 
-  return stats
+  return shuffle(candidates).slice(0, count)
+}
+
+/* ============== 稀有度规则 ============== */
+
+function getTierByLevel(level) {
+  if (level >= 6) return 'gold'
+  if (level >= 3) return 'silver'
+  return 'bronze'
+}
+
+function shuffle(arr) {
+  return [...arr].sort(() => Math.random() - 0.5)
 }

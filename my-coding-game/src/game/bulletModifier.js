@@ -1,21 +1,34 @@
 // src/game/bulletModifier.js
-import { calcDamage } from './damage'
 
+/**
+ * 构建子弹的【行为 & 表现属性】
+ * ❗ 不包含任何伤害计算
+ * ❗ 不包含敌人 / 命中逻辑
+ */
 export function buildBulletStats(baseStats, skillStats) {
   return {
-    damage: calcDamage({
-      base: 10,
-      attack: baseStats.attack,
-      dmgUp: skillStats.dmgUp || 0,
-      dmgDown: skillStats.dmgDown || 0,
-      isCrit: false,
-      critBonus: skillStats.critDmg || 0
-    }),
-    size: 6 * (1 + (skillStats.sizeUp || 0)),
+    /* ================= 飞行属性 ================= */
+
+    speed:
+      baseStats.bulletSpeed *
+      (skillStats.bulletSpeedMultiplier || 1),
+
+    /* ================= 尺寸 / 表现 ================= */
+
+    size:
+      (baseStats.bulletSize || 6) *
+      (1 + (skillStats.sizeUp || 0)),
+
+    /* ================= 穿透 ================= */
+
     pierce: skillStats.pierce || 0,
-    critRate:
-      skillStats.forceCrit ? 1 : (baseStats.critRate + (skillStats.critRate || 0)),
-    critDmg: baseStats.critDmg + (skillStats.critDmg || 0),
+
+    /* ================= 子弹样式（纯装饰） ================= */
+
+    bulletType: skillStats.bulletType || 'normal',
+
+    /* ================= 特殊标记（给 bulletHit 用） ================= */
+
     forceCrit: skillStats.forceCrit || false,
     ignoreDamageReduce: skillStats.ignoreDamageReduce || false
   }

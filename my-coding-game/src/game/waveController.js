@@ -1,46 +1,77 @@
 // src/game/waveController.js
-import { createEnemy } from './enemyTypes'
+import { createEnemy } from './enemyFactory'
 
+/**
+ * 创建刷怪控制器
+ * @param {Object} stage 关卡配置（来自 config/stages.js）
+ * @param {Array} enemies 敌人数组（GameCanvas 里那一个）
+ */
 export function createWaveController(stage, enemies) {
-  let waveIndex = 0
+  let currentWaveIndex = 0
   let spawnTimer = 0
-  let spawned = 0
+  let spawnedInWave = 0
+  let state = 'RUNNING' // RUNNING | STAGE_CLEAR
+
+  const waves = stage.waves
 
   function update(dt) {
-    const wave = stage.waves[waveIndex]
-    if (!wave) return 'STAGE_CLEAR'
+    if (state !== 'RUNNING') return state
+
+    const wave = waves[currentWaveIndex]
+    if (!wave) {
+      state = 'STAGE_CLEAR'
+      return state
+    }
 
     spawnTimer += dt
 
-    if (spawned < wave.count && spawnTimer >= wave.interval) {
-      spawnEnemy(wave)
-      spawnTimer = 0
-      spawned++
-    }
+    /* ================= 刷怪 ================= */
 
-    // 当前波已清完
     if (
-      spawned === wave.count &&
-      enemies.length === 0
+      spawnedInWave < wave.count &&
+      spawnTimer >= wave.interval
     ) {
-      waveIndex++
-      spawned = 0
+      spawnTimer = 0
+      spawnedInWave++
+
+      enemies.push(
+        createEnemy({
+          type: wave.enemyType,
+          x: randomX(),
+          y: -30
+        })
+      )
+    }
+
+    /* ================= 波次结束判定 ================= */
+
+    const noAliveEnemy = enemies.every(e => !e.alive)
+
+    if (
+      spawnedInWave >= wave.count &&
+      noAliveEnemy
+    ) {
+      currentWaveIndex++
+      spawnedInWave = 0
       spawnTimer = 0
     }
 
-    return 'RUNNING'
+    return state
   }
 
-  function spawnEnemy(wave) {
-    enemies.push(
-      createEnemy({
-        x: 40 + Math.random() * 280,
-        hp: wave.hp,
-        speed: wave.speed,
-        damageReduce: wave.isBoss ? 0.3 : 0
-      })
-    )
+  return {
+    update,
+    getState() {
+      return state
+    },
+    getCurrentWave() {
+      return currentWaveIndex + 1
+    }
   }
+}
 
-  return { update }
+/* ================= 工具 ================= */
+
+function randomX() {
+  return 40 + Math.random() * (360 - 80)
 }

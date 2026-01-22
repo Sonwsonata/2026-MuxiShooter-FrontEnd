@@ -1,10 +1,11 @@
+// src/game/GameCanvas.jsx
 import { useEffect, useRef } from 'react'
-import { fireBullets } from './fireBullets'
-import { handleBulletHit } from './bulletHit'
-import { getFireInterval } from './fireController'
-import { useGameStore } from '../store/gameStore'
+import { fireBullets } from '../combat/fireBullets'
+import { handleBulletHit } from '../combat/bulletHit'
+import { getFireInterval } from '../fireController'
+import { useGameStore } from '../../store/gameStore'
 import { STAGES } from '../config/stages'
-import { createWaveController } from './waveController'
+import { createWaveController } from '../wave/waveController'
 
 const WIDTH = 360
 const HEIGHT = 640
@@ -12,106 +13,106 @@ const DEFENSE_LINE = 520
 
 export default function GameCanvas() {
   const canvasRef = useRef(null)
-  const lastTime = useRef(0)
-  const fireTimer = useRef(0)
-  const waveController = useRef(null)
+  const lastTimeRef = useRef(0)
+  const fireTimerRef = useRef(0)
+  const waveControllerRef = useRef(null)
 
-  const {
-    baseStats,
-    skillStats,
-    bullets,
-    enemies,
-    player,
-    hp,
-    setHP,
-    gainExp,
-    levelUp,
-    pauseGame,
-    setLevelUp
-  } = useGameStore()
+  /* ================= 战斗态（不进 store） ================= */
+
+  const playerRef = useRef({
+    x: WIDTH / 2,
+    baseY: DEFENSE_LINE + 20,
+    y: DEFENSE_LINE + 20,
+    size: 16
+  })
+
+  const bulletsRef = useRef([])
+  const enemiesRef = useRef([])
+  const hpRef = useRef(10)
+
+  /* ================= 规则态（来自 store） ================= */
+
+  const pauseGame = useGameStore(state => state.pauseGame)
+  const gainExp = useGameStore(state => state.gainExp)
 
   /* ================= 初始化关卡 ================= */
+
   useEffect(() => {
-    const stage = STAGES[0] // TODO: 从主页传入
-    waveController.current = createWaveController(stage, enemies)
+    const stage = STAGES[0]
+    waveControllerRef.current = createWaveController(
+      stage,
+      enemiesRef.current
+    )
   }, [])
 
   /* ================= 主循环 ================= */
+
   useEffect(() => {
     const canvas = canvasRef.current
     const ctx = canvas.getContext('2d')
 
     function loop(time) {
-    let dt = (time - lastTime.current) / 1000
-      dt = Math.min(dt, 0.033) // 最大 30ms
+      let dt = (time - lastTimeRef.current) / 1000
+      dt = Math.min(dt, 0.033)
+      lastTimeRef.current = time
 
-      lastTime.current = time
-
-     if (!pauseGame) {
+      if (!pauseGame) {
         update(dt)
       }
+
       render(ctx)
-
-
       requestAnimationFrame(loop)
     }
 
     requestAnimationFrame(loop)
-  }, [])
+  }, [pauseGame])
 
   /* ================= 更新逻辑 ================= */
+
   function update(dt) {
-    if (waveController.current) {
-      const waveState = waveController.current.update(dt)
-      if (waveState === 'STAGE_CLEAR') {
-        console.log('关卡胜利')
-      }
-    }
+    const player = playerRef.current
+    const bullets = bulletsRef.current
+    const enemies = enemiesRef.current
 
-    /* 自动射击 */
-    fireTimer.current += dt
-    const interval = getFireInterval(
-      baseStats.fireInterval,
-      skillStats
-    )
+    /* ---- 刷怪 ---- */
+    waveControllerRef.current?.update(dt)
 
-    if (fireTimer.current >= interval) {
+    /* ---- 自动射击 ---- */
+    fireTimerRef.current += dt
+    const interval = getFireInterval(0.25, {}) // 基础攻速
+
+    if (fireTimerRef.current >= interval) {
       fireBullets({
         player,
-        baseStats,
-        skillStats,
-        bullets,
-        damage,
-        size,
-        speed,
-        pierce: skillStats.pierce || 0,
-        critRate: skillStats.critRate || 0,
-        critDmg: skillStats.critDmg || 0,
-        forceCrit: skillStats.forceCrit || false,
-        ignoreDamageReduce: skillStats.ignoreDamageReduce || false,
-        hitCount: 0
+        baseStats: {
+          attack: 0,
+          critRate: 0.1,
+          critDmg: 1
+        },
+        skillStats: {},
+        bullets
       })
-      fireTimer.current = 0
+      fireTimerRef.current = 0
     }
 
-    /* 更新子弹 */
+    /* ---- 子弹更新 ---- */
     bullets.forEach(b => {
       b.y -= b.speed * dt
       if (b.y < -20) b.alive = false
     })
 
-    /* 更新敌人 */
+    /* ---- 敌人更新（直线推进） ---- */
     enemies.forEach(e => {
       e.y += e.speed * dt
-      e.scale = 0.5 + e.y / HEIGHT
+      e.scale = 0.6 + e.y / HEIGHT
 
       if (e.y >= DEFENSE_LINE) {
-        setHP(hp - 1)
+        hpRef.current -= 1
         e.alive = false
       }
     })
 
-    /* 碰撞检测 */
+    /* ---- 碰撞检测 ---- */
     bullets.forEach(b => {
       if (!b.alive) return
       enemies.forEach(e => {
@@ -123,9 +124,10 @@ export default function GameCanvas() {
 
         if (dist < b.size + e.size * e.scale) {
           handleBulletHit(b, e)
+
           if (e.hp <= 0) {
             e.alive = false
-            gainExp(1)
+            gainExp(20) // 第一关基础经验
           }
         }
       })
@@ -133,33 +135,38 @@ export default function GameCanvas() {
 
     cleanArray(bullets)
     cleanArray(enemies)
-
-    if (
-      useGameStore.getState().exp >=
-      useGameStore.getState().expMax &&
-      !isLevelUp
-    ) {
-      setLevelUp(true)
-    }
   }
 
-
   /* ================= 渲染 ================= */
+
   function render(ctx) {
+    const player = playerRef.current
+    const bullets = bulletsRef.current
+    const enemies = enemiesRef.current
+
     ctx.clearRect(0, 0, WIDTH, HEIGHT)
 
+    /* 背景 */
     ctx.fillStyle = '#000'
     ctx.fillRect(0, 0, WIDTH, HEIGHT)
 
+    /* 防守线 */
     ctx.strokeStyle = '#444'
     ctx.beginPath()
     ctx.moveTo(0, DEFENSE_LINE)
     ctx.lineTo(WIDTH, DEFENSE_LINE)
     ctx.stroke()
 
+    /* 玩家 */
     ctx.fillStyle = '#4af'
-    ctx.fillRect(player.x - 15, DEFENSE_LINE + 10, 30, 30)
+    ctx.fillRect(
+      player.x - player.size,
+      player.y - player.size,
+      player.size * 2,
+      player.size * 2
+    )
 
+    /* 子弹 */
     ctx.fillStyle = '#fff'
     bullets.forEach(b => {
       ctx.beginPath()
@@ -167,11 +174,14 @@ export default function GameCanvas() {
       ctx.fill()
     })
 
+    /* 敌人 */
     enemies.forEach(e => {
       const size = e.size * e.scale
+
       ctx.fillStyle = 'red'
       ctx.fillRect(e.x - size / 2, e.y - size / 2, size, size)
 
+      // 血条
       ctx.fillStyle = '#000'
       ctx.fillRect(e.x - size / 2, e.y - size / 2 - 6, size, 4)
       ctx.fillStyle = '#0f0'
@@ -183,23 +193,22 @@ export default function GameCanvas() {
       )
     })
 
+    /* UI */
     ctx.fillStyle = '#fff'
-    ctx.fillText(`HP: ${hp}`, 10, 20)
-
-    const expRatio =
-      useGameStore.getState().exp /
-      useGameStore.getState().expMax
-    ctx.fillRect(10, 30, 100 * expRatio, 6)
+    ctx.fillText(`HP: ${hpRef.current}`, 10, 20)
   }
 
-  /* ================= 触控 ================= */
+  /* ================= 触控 / 鼠标 ================= */
+
   useEffect(() => {
     const canvas = canvasRef.current
+    const player = playerRef.current
 
     function move(e) {
-      const touch = e.touches ? e.touches[0] : e
+      const p = e.touches ? e.touches[0] : e
       const rect = canvas.getBoundingClientRect()
-      const x = touch.clientX - rect.left
+
+      const x = p.clientX - rect.left
       player.x = Math.max(20, Math.min(WIDTH - 20, x))
     }
 
@@ -221,6 +230,8 @@ export default function GameCanvas() {
     />
   )
 }
+
+/* ================= 工具 ================= */
 
 function cleanArray(arr) {
   for (let i = arr.length - 1; i >= 0; i--) {

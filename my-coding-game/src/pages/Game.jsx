@@ -1,4 +1,4 @@
-import GameCanvas from '../game/GameCanvas'
+import GameCanvas from '../game/canvas/GameCanvas.jsx'
 
 export default function Game() {
   return (

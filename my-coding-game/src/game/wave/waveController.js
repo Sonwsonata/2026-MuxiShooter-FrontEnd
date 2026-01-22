@@ -1,16 +1,12 @@
 // src/game/waveController.js
-import { createEnemy } from './enemyFactory'
+import { createEnemy } from '../enemy/enemyFactory'
+import { ENEMY_TYPES } from '../enemy/enemyTypes'
 
-/**
- * 创建刷怪控制器
- * @param {Object} stage 关卡配置（来自 config/stages.js）
- * @param {Array} enemies 敌人数组（GameCanvas 里那一个）
- */
 export function createWaveController(stage, enemies) {
   let currentWaveIndex = 0
   let spawnTimer = 0
   let spawnedInWave = 0
-  let state = 'RUNNING' // RUNNING | STAGE_CLEAR
+  let state = 'RUNNING'
 
   const waves = stage.waves
 
@@ -25,8 +21,6 @@ export function createWaveController(stage, enemies) {
 
     spawnTimer += dt
 
-    /* ================= 刷怪 ================= */
-
     if (
       spawnedInWave < wave.count &&
       spawnTimer >= wave.interval
@@ -34,23 +28,21 @@ export function createWaveController(stage, enemies) {
       spawnTimer = 0
       spawnedInWave++
 
+      const base = ENEMY_TYPES[wave.enemyType]
+
       enemies.push(
         createEnemy({
-          type: wave.enemyType,
-          x: randomX(),
-          y: -30
-        })
+        type: wave.enemyType,
+        x: randomX(),
+        y: -30,
+        wave
+      })
       )
     }
 
-    /* ================= 波次结束判定 ================= */
-
     const noAliveEnemy = enemies.every(e => !e.alive)
 
-    if (
-      spawnedInWave >= wave.count &&
-      noAliveEnemy
-    ) {
+    if (spawnedInWave >= wave.count && noAliveEnemy) {
       currentWaveIndex++
       spawnedInWave = 0
       spawnTimer = 0
@@ -61,16 +53,17 @@ export function createWaveController(stage, enemies) {
 
   return {
     update,
-    getState() {
+    getState(){
       return state
     },
     getCurrentWave() {
       return currentWaveIndex + 1
+    },
+    getCurrentWaveConfig() {
+      return waves[currentWaveIndex]
     }
   }
 }
-
-/* ================= 工具 ================= */
 
 function randomX() {
   return 40 + Math.random() * (360 - 80)

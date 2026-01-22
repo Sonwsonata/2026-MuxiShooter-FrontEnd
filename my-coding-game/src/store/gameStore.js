@@ -1,49 +1,77 @@
 import { create } from 'zustand'
-import { getRandomSkills } from '../game/skillSystem'
+import { getRandomSkills } from '../game/skill/skillSystem'
+
+/* ================= 经验曲线 ================= */
+
+// 你以后想换“波动式”“阶段式”，只改这里
+function calcExpMax(level) {
+  return Math.floor(10 + level * level * 1.5)
+}
 
 export const useGameStore = create((set, get) => ({
   /* ================= 基础成长 ================= */
 
   level: 1,
   exp: 0,
-  nextExp: 10,
+  expMax: calcExpMax(1),
 
   isLevelUp: false,
   pauseGame: false,
 
   /* ================= 技能系统 ================= */
 
-  skillLevels: {},      // { attack: 2, rows: 1 }
-  skillEffects: [],     // 具体技能 effect
-  levelUpChoices: [],   // 本次升级给的技能选项
+  skillLevels: {},
+  skillEffects: [],
+  levelUpChoices: [],
 
-  /* ================== 升级相关 ================== */
+  /* ================== 经验获取 ================== */
 
   gainExp(amount) {
-    const { exp, nextExp } = get()
-    const newExp = exp + amount
+    let { exp, expMax, level } = get()
 
-    if (newExp >= nextExp) {
+    exp += amount
+    let leveledUp = false
+
+    while (exp >= expMax) {
+      exp -= expMax
+      level += 1
+      expMax = calcExpMax(level)
+      leveledUp = true
+    }
+
+    if (leveledUp) {
+      const { skillLevels } = get()
+
       set({
-        exp: newExp - nextExp,
-        level: get().level + 1,
-        nextExp: Math.floor(nextExp * 1.5),
+        exp,
+        level,
+        expMax,
+
         isLevelUp: true,
         pauseGame: true,
-        levelUpChoices: getRandomSkills(get().skillLevels, 3)
+
+        levelUpChoices: getRandomSkills({
+          ownedSkills: skillLevels,
+          count: 3
+        })
       })
     } else {
-      set({ exp: newExp })
+      set({ exp })
     }
   },
+
+  /* ================== 选择技能 ================== */
 
   pickSkill(skill) {
     set(state => ({
       skillLevels: {
         ...state.skillLevels,
-        [skill.key]: (state.skillLevels[skill.key] || 0) + 1
+        [skill.category]:
+          (state.skillLevels[skill.category] || 0) + 1
       },
+
       skillEffects: [...state.skillEffects, skill],
+
       isLevelUp: false,
       pauseGame: false,
       levelUpChoices: []

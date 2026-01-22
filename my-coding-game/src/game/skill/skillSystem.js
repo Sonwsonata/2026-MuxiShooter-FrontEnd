@@ -1,5 +1,5 @@
 // src/game/skillSystem.js
-import { SKILL_POOL } from '../config/skillPool'
+import { SKILL_POOL } from './skillPool'
 
 export function getRandomSkills({
   ownedSkills = {},

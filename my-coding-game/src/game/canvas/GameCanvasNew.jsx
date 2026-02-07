@@ -64,20 +64,7 @@ export default function GameCanvasNew() {
   }, [])
 
   /* ================= 处理升级 ================= */
-
-  useEffect(() => {
-    if (isLevelUp) {
-      // 升级后自动继续游戏（临时方案）
-      // TODO: 后续集成技能选择界面
-      setTimeout(() => {
-        useGameStore.getState().pickSkill({
-          category: '前端',
-          name: '自动继续',
-          tier: 'bronze'
-        })
-      }, 500)
-    }
-  }, [isLevelUp])
+  // 升级后会显示技能选择界面，由 SkillSelectModal 组件处理
 
   /* ================= 主循环 ================= */
 

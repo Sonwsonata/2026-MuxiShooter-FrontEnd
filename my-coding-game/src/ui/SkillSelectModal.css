@@ -1,0 +1,126 @@
+.skill-select-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.skill-select-modal {
+  background: #1a1a2e;
+  border: 2px solid #4af;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(74, 170, 255, 0.3);
+}
+
+.modal-title {
+  color: #4af;
+  font-size: 24px;
+  margin: 0 0 8px 0;
+  text-align: center;
+}
+
+.modal-subtitle {
+  color: #aaa;
+  font-size: 14px;
+  margin: 0 0 20px 0;
+  text-align: center;
+}
+
+.skill-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skill-card {
+  background: #16213e;
+  border: 2px solid #333;
+  border-radius: 8px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.skill-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.skill-tier-bronze {
+  border-color: #cd7f32;
+}
+
+.skill-tier-bronze:hover {
+  border-color: #ff9f4a;
+  box-shadow: 0 4px 12px rgba(205, 127, 50, 0.4);
+}
+
+.skill-tier-silver {
+  border-color: #c0c0c0;
+}
+
+.skill-tier-silver:hover {
+  border-color: #e0e0e0;
+  box-shadow: 0 4px 12px rgba(192, 192, 192, 0.4);
+}
+
+.skill-tier-gold {
+  border-color: #ffd700;
+}
+
+.skill-tier-gold:hover {
+  border-color: #ffed4e;
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.5);
+}
+
+.skill-tier-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.skill-tier-bronze .skill-tier-badge {
+  color: #ff9f4a;
+}
+
+.skill-tier-silver .skill-tier-badge {
+  color: #e0e0e0;
+}
+
+.skill-tier-gold .skill-tier-badge {
+  color: #ffed4e;
+}
+
+.skill-category {
+  color: #4af;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.skill-name {
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.skill-desc {
+  color: #aaa;
+  font-size: 14px;
+  line-height: 1.4;
+}

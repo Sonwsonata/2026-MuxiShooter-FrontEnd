@@ -5,7 +5,6 @@ export default function TabBar() {
     <div className="tabbar">
       <NavLink to="/">主页</NavLink>
       <NavLink to="/skills">技能</NavLink>
-      <NavLink to="/game">战斗</NavLink>
       <NavLink to="/enhance">强化</NavLink>
       <NavLink to="/codex">图鉴</NavLink>
     </div>

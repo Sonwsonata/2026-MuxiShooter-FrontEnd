@@ -148,25 +148,30 @@ export class CombatManager {
     })
     
     // 发射镜像弹幕
-    for (let i = 0; i < mirrorCount; i++) {
-      const offsetX = (i + 1) * 40 * (i % 2 === 0 ? 1 : -1)
-      this.createBasicBullet({
-        x: player.x + offsetX,
-        y: player.y,
-        damage: damageResult.damage,
-        isCrit: damageResult.isCrit,
-        bullets
-      })
+    if (mirrorCount > 0) {
+      for (let i = 0; i < mirrorCount; i++) {
+        // 交替在左右两侧
+        const side = i % 2 === 0 ? 1 : -1
+        const offsetX = Math.floor((i + 1) / 2) * 50 * side
+        
+        this.createBasicBullet({
+          x: player.x + offsetX,
+          y: player.y,
+          damage: damageResult.damage,
+          isCrit: damageResult.isCrit,
+          bullets,
+          isMirror: true
+        })
+      }
     }
     
     // 重置临时效果
     this.damageCalculator.resetTemporaryEffects()
   }
-
   /**
    * 创建基础弹幕
    */
-  createBasicBullet({ x, y, damage, isCrit, bullets }) {
+  createBasicBullet({ x, y, damage, isCrit, bullets, isMirror = false }) {
     bullets.push({
       x,
       y,
@@ -177,9 +182,8 @@ export class CombatManager {
       pierce: 0,
       maxPierce: 0,
       size: 4,
-      color: isCrit ? '#ff0' : '#fff',
-      alive: true,
-      source: 'basic'
+      color: isMirror ? (isCrit ? '#f0f' : '#4af') : (isCrit ? '#ff0' : '#fff'),
+      alive: true
     })
   }
 

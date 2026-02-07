@@ -201,6 +201,39 @@ export default function GameCanvasNew() {
       player.size * 2,
       player.size * 2
     )
+    
+    /* 镜像 */
+    if (combatManager) {
+      const mirrorCount = combatManager.buffManager.getMirrorCount()
+      if (mirrorCount > 0) {
+        // 设置半透明
+        ctx.globalAlpha = 0.4
+        
+        for (let i = 0; i < mirrorCount; i++) {
+          // 计算镜像位置（与弹幕位置一致）
+          const side = i % 2 === 0 ? 1 : -1
+          const offsetX = (i + 1) * 50 * side
+          
+          // 绘制镜像玩家
+          ctx.fillStyle = '#4af'
+          ctx.fillRect(
+            player.x + offsetX - player.size,
+            player.y - player.size,
+            player.size * 2,
+            player.size * 2
+          )
+          
+          // 绘制镜像标记（小圆点）
+          ctx.fillStyle = '#0ff'
+          ctx.beginPath()
+          ctx.arc(player.x + offsetX, player.y - player.size - 8, 3, 0, Math.PI * 2)
+          ctx.fill()
+        }
+        
+        // 恢复不透明度
+        ctx.globalAlpha = 1.0
+      }
+    }
 
     /* 子弹 */
     bullets.forEach(b => {

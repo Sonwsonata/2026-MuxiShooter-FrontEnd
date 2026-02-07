@@ -31,6 +31,9 @@ export default function GameCanvasNew() {
   /* ================= 规则态（来自 store） ================= */
 
   const pauseGame = useGameStore(state => state.pauseGame)
+  const level = useGameStore(state => state.level)
+  const exp = useGameStore(state => state.exp)
+  const expMax = useGameStore(state => state.expMax)
 
   /* ================= 初始化 ================= */
 
@@ -224,16 +227,36 @@ export default function GameCanvasNew() {
     /* UI */
     ctx.fillStyle = '#fff'
     ctx.font = '14px Arial'
+    
+    // HP
     ctx.fillText(`HP: ${hpRef.current}`, 10, 20)
-
+    
+    // 等级
+    ctx.fillText(`Level: ${level}`, 10, 40)
+    
+    // 经验条背景
+    ctx.fillStyle = '#333'
+    ctx.fillRect(10, 50, 200, 10)
+    
+    // 经验条
+    ctx.fillStyle = '#0f0'
+    const expPercent = exp / expMax
+    ctx.fillRect(10, 50, 200 * expPercent, 10)
+    
+    // 经验文本
+    ctx.fillStyle = '#fff'
+    ctx.font = '10px Arial'
+    ctx.fillText(`${exp}/${expMax}`, 15, 58)
+    
     // 显示激活的技能
+    ctx.font = '14px Arial'
     if (combatManager) {
       const activeSkills = combatManager.skillManager.getActiveSkills()
-      ctx.fillText(`Active Skills: ${activeSkills.length}`, 10, 40)
+      ctx.fillText(`Active Skills: ${activeSkills.length}`, 10, 80)
 
       // 显示Buff数量
       const buffs = combatManager.buffManager.getActiveBuffs()
-      ctx.fillText(`Buffs: ${buffs.length}`, 10, 60)
+      ctx.fillText(`Buffs: ${buffs.length}`, 10, 100)
     }
   }
 

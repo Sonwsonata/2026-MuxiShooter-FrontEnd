@@ -149,15 +149,19 @@ export class CombatManager {
       y: player.y,
       damage: damageResult.damage,
       isCrit: damageResult.isCrit,
-      bullets
+      bullets,
+      isMirror: false  // 明确标记为非镜像
     })
     
     // 发射镜像弹幕
     if (mirrorCount > 0) {
+      console.log('[Mirror] Starting to create', mirrorCount, 'mirror bullets')
       for (let i = 0; i < mirrorCount; i++) {
         // 交替在左右两侧
         const side = i % 2 === 0 ? 1 : -1
         const offsetX = Math.floor((i + 1) / 2) * 50 * side
+        
+        console.log('[Mirror] Creating mirror bullet', i + 1, 'at offsetX:', offsetX)
         
         this.createBasicBullet({
           x: player.x + offsetX,
@@ -168,6 +172,7 @@ export class CombatManager {
           isMirror: true
         })
       }
+      console.log('[Mirror] Total bullets after creation:', bullets.length)
     }
     
     // 重置临时效果

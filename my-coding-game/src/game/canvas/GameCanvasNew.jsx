@@ -31,7 +31,6 @@ export default function GameCanvasNew() {
   /* ================= 规则态（来自 store） ================= */
 
   const pauseGame = useGameStore(state => state.pauseGame)
-  const gainExp = useGameStore(state => state.gainExp)
 
   /* ================= 初始化 ================= */
 
@@ -155,7 +154,7 @@ export default function GameCanvasNew() {
 
           if (e.hp <= 0) {
             e.alive = false
-            gainExp(20)
+            useGameStore.getState().gainExp(20)
           }
         }
       })

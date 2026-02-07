@@ -216,6 +216,8 @@ export class SkillExecutor {
     const duration = skill.baseDuration * (1 + skill.durationModifier)
     const mirrorCount = effect.mirrorCount || 1
 
+    console.log('[AI Tool] Executing, mirrorCount:', mirrorCount, 'duration:', duration)
+
     // 添加镜像Buff
     this.ctx.buffManager.addBuff({
       type: BuffType.MIRROR,
@@ -223,6 +225,8 @@ export class SkillExecutor {
       duration,
       source: skill.id
     })
+    
+    console.log('[AI Tool] Buff added, current buffs:', this.ctx.buffManager.getActiveBuffs().length)
 
     // 如果有镜像伤害加成
     if (effect.mirrorDamageBonus) {

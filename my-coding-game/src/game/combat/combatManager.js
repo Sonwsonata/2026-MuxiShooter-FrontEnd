@@ -138,6 +138,11 @@ export class CombatManager {
     // 获取镜像数量
     const mirrorCount = this.buffManager.getMirrorCount()
     
+    // 调试日志
+    if (mirrorCount > 0) {
+      console.log('[Mirror] Creating mirror bullets, count:', mirrorCount)
+    }
+    
     // 发射主弹幕
     this.createBasicBullet({
       x: player.x,

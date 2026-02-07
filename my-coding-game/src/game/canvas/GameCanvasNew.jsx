@@ -30,7 +30,6 @@ export default function GameCanvasNew() {
 
   /* ================= 规则态（来自 store） ================= */
 
-  const pauseGame = useGameStore(state => state.pauseGame)
   const isLevelUp = useGameStore(state => state.isLevelUp)
   const level = useGameStore(state => state.level)
   const exp = useGameStore(state => state.exp)
@@ -77,7 +76,9 @@ export default function GameCanvasNew() {
       dt = Math.min(dt, 0.033)
       lastTimeRef.current = time
 
-      if (!pauseGame) {
+      // 直接从 store 获取最新的 pauseGame 状态
+      const isPaused = useGameStore.getState().pauseGame
+      if (!isPaused) {
         update(dt)
       }
 
@@ -86,7 +87,7 @@ export default function GameCanvasNew() {
     }
 
     requestAnimationFrame(loop)
-  }, [pauseGame])
+  }, [])
 
   /* ================= 更新逻辑 ================= */
 

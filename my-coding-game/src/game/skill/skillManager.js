@@ -243,4 +243,46 @@ export class SkillManager {
     const skill = this.ownedSkills.get(skillId)
     return skill ? skill.baseCd * (1 + skill.cdModifier) : 0
   }
+
+  /**
+   * 清空所有技能
+   */
+  clearSkills() {
+    this.ownedSkills.clear()
+    this.activeSkills.clear()
+  }
+
+  /**
+   * 添加带有完整效果的技能（用于从升级系统同步）
+   */
+  addSkillWithEffect(skillData) {
+    // skillData 已经包含了完整的效果（基础+所有强化）
+    const skill = {
+      id: skillData.id,
+      name: skillData.name,
+      type: skillData.type,
+      level: skillData.level || 1,
+      
+      // 冷却相关
+      baseCd: skillData.cd,
+      currentCd: 0,
+      cdModifier: 0,
+      
+      // 持续时间
+      baseDuration: skillData.duration || 0,
+      durationModifier: 0,
+      
+      // 效果配置（已经包含所有强化）
+      effect: skillData.effect || {},
+      
+      // 已选择的强化
+      upgrades: skillData.upgrades || [],
+      
+      // 定义引用
+      definition: skillData
+    }
+    
+    this.ownedSkills.set(skillData.id, skill)
+    return skill
+  }
 }

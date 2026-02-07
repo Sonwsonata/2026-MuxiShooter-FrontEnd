@@ -1,12 +1,15 @@
 import { create } from 'zustand'
-import { getRandomSkills } from '../game/skill/skillSystem'
+import { SkillUpgradeSystem } from '../game/skill/skillUpgradeSystem'
 
 /* ================= 经验曲线 ================= */
 
-// 你以后想换“波动式”“阶段式”，只改这里
+// 你以后想换"波动式""阶段式"，只改这里
 function calcExpMax(level) {
   return Math.floor(10 + level * level * 1.5)
 }
+
+// 创建技能升级系统实例
+const skillUpgradeSystem = new SkillUpgradeSystem()
 
 export const useGameStore = create((set, get) => ({
   /* ================= 基础成长 ================= */
@@ -18,7 +21,6 @@ export const useGameStore = create((set, get) => ({
   isLevelUp: false,
   pauseGame: false,
 
-
   /* ================= 战斗数值 ================= */
   combatStats: {
     attack: 0,             // 额外攻击力
@@ -29,8 +31,10 @@ export const useGameStore = create((set, get) => ({
 
   /* ================= 技能系统 ================= */
 
-  skillLevels: {},
-  skillEffects: [],
+  // 技能升级系统实例
+  skillUpgradeSystem,
+
+  // 升级选项
   levelUpChoices: [],
 
   /* ================== 经验获取 ================== */
@@ -49,41 +53,67 @@ export const useGameStore = create((set, get) => ({
     }
 
     if (leveledUp) {
-      const { skillLevels } = get()
+      // 获取升级选项
+      const choices = skillUpgradeSystem.getLevelUpOptions(3)
 
       set({
         exp,
         level,
         expMax,
-
         isLevelUp: true,
         pauseGame: true,
-
-        levelUpChoices: getRandomSkills({
-          ownedSkills: skillLevels,
-          count: 3
-        })
+        levelUpChoices: choices
       })
     } else {
       set({ exp })
     }
   },
 
-  /* ================== 选择技能 ================== */
+  /* ================== 选择技能/强化 ================== */
 
-  pickSkill(skill) {
-    set(state => ({
-      skillLevels: {
-        ...state.skillLevels,
-        [skill.category]:
-          (state.skillLevels[skill.category] || 0) + 1
-      },
+  pickSkill(option) {
+    // 应用选择
+    const result = skillUpgradeSystem.selectOption(option)
+    
+    console.log('[Skill System] Selected:', result)
 
-      skillEffects: [...state.skillEffects, skill],
-
+    set({
       isLevelUp: false,
       pauseGame: false,
       levelUpChoices: []
-    }))
+    })
+
+    // 返回结果供游戏使用
+    return result
+  },
+
+  /* ================== 获取激活的技能 ================== */
+
+  getActiveSkills() {
+    return skillUpgradeSystem.getActiveSkills()
+  },
+
+  /* ================== 重置游戏 ================== */
+
+  resetGame() {
+    skillUpgradeSystem.reset()
+    
+    set({
+      level: 1,
+      exp: 0,
+      expMax: calcExpMax(1),
+      isLevelUp: false,
+      pauseGame: false,
+      levelUpChoices: [],
+      combatStats: {
+        attack: 0,
+        damageMultiplier: 1,
+        critRate: 0.05,
+        critDamage: 1.5
+      }
+    })
   }
 }))
+
+// 导出技能升级系统供外部使用
+export { skillUpgradeSystem }

@@ -64,6 +64,24 @@ export default function GameCanvasNew() {
 
   /* ================= 处理升级 ================= */
   // 升级后会显示技能选择界面，由 SkillSelectModal 组件处理
+  
+  // 同步技能到战斗系统
+  useEffect(() => {
+    if (!combatManagerRef.current) return
+    
+    // 获取当前激活的技能
+    const activeSkills = useGameStore.getState().getActiveSkills()
+    
+    // 清空现有技能
+    combatManagerRef.current.clearSkills()
+    
+    // 添加所有激活的技能
+    activeSkills.forEach(skill => {
+      combatManagerRef.current.addSkillWithEffect(skill)
+    })
+    
+    console.log('[Game] Synced skills:', activeSkills.length)
+  }, [level]) // 当等级变化时同步
 
   /* ================= 主循环 ================= */
 

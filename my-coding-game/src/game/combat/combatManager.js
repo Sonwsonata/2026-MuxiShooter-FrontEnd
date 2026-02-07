@@ -237,6 +237,22 @@ export class CombatManager {
   }
 
   /**
+   * 清空所有技能
+   */
+  clearSkills() {
+    this.skillManager.clearSkills()
+    this.skillTimers.clear()
+  }
+
+  /**
+   * 添加带有完整效果的技能（用于从升级系统同步）
+   */
+  addSkillWithEffect(skillData) {
+    // skillData 包含完整的技能定义和效果
+    return this.skillManager.addSkillWithEffect(skillData)
+  }
+
+  /**
    * 获取敌人速度修正
    */
   getEnemySpeedModifier() {

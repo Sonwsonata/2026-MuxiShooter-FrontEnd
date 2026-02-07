@@ -124,3 +124,40 @@
   font-size: 14px;
   line-height: 1.4;
 }
+
+/* 新技能样式 */
+.skill-tier-new {
+  border-color: #0ff;
+  background: linear-gradient(135deg, #16213e 0%, #1a2a4e 100%);
+}
+
+.skill-tier-new:hover {
+  border-color: #4ff;
+  box-shadow: 0 4px 12px rgba(0, 255, 255, 0.4);
+}
+
+.skill-tier-new .skill-tier-badge {
+  color: #0ff;
+}
+
+/* 效果预览 */
+.skill-effect-preview {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #333;
+}
+
+.effect-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.effect-tag {
+  background: rgba(74, 170, 255, 0.2);
+  color: #4af;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(74, 170, 255, 0.3);
+}

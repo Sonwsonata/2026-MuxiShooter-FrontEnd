@@ -31,6 +31,7 @@ export default function GameCanvasNew() {
   /* ================= 规则态（来自 store） ================= */
 
   const pauseGame = useGameStore(state => state.pauseGame)
+  const isLevelUp = useGameStore(state => state.isLevelUp)
   const level = useGameStore(state => state.level)
   const exp = useGameStore(state => state.exp)
   const expMax = useGameStore(state => state.expMax)
@@ -61,6 +62,22 @@ export default function GameCanvasNew() {
       combatManagerRef.current?.cleanup()
     }
   }, [])
+
+  /* ================= 处理升级 ================= */
+
+  useEffect(() => {
+    if (isLevelUp) {
+      // 升级后自动继续游戏（临时方案）
+      // TODO: 后续集成技能选择界面
+      setTimeout(() => {
+        useGameStore.getState().pickSkill({
+          category: '前端',
+          name: '自动继续',
+          tier: 'bronze'
+        })
+      }, 500)
+    }
+  }, [isLevelUp])
 
   /* ================= 主循环 ================= */
 
@@ -257,6 +274,15 @@ export default function GameCanvasNew() {
       // 显示Buff数量
       const buffs = combatManager.buffManager.getActiveBuffs()
       ctx.fillText(`Buffs: ${buffs.length}`, 10, 100)
+    }
+    
+    // 升级提示
+    if (isLevelUp) {
+      ctx.fillStyle = '#ff0'
+      ctx.font = 'bold 24px Arial'
+      ctx.fillText('LEVEL UP!', WIDTH / 2 - 60, HEIGHT / 2)
+      ctx.font = '16px Arial'
+      ctx.fillText('自动继续游戏...', WIDTH / 2 - 70, HEIGHT / 2 + 30)
     }
   }
 

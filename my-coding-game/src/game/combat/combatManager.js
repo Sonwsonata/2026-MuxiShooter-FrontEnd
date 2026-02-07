@@ -159,7 +159,7 @@ export class CombatManager {
       for (let i = 0; i < mirrorCount; i++) {
         // 交替在左右两侧
         const side = i % 2 === 0 ? 1 : -1
-        const offsetX = Math.floor((i + 1) / 2) * 50 * side
+        const offsetX = (i + 1) * 50 * side  // 修复：直接使用 (i+1) 而不是 Math.floor((i+1)/2)
         
         console.log('[Mirror] Creating mirror bullet', i + 1, 'at offsetX:', offsetX)
         

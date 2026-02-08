@@ -293,21 +293,29 @@ export default function GameCanvasNew({ onCombatManagerReady }) {
     ctx.fillText(`HP: ${hpRef.current}`, 10, 20)
     
     // 等级
-    ctx.fillText(`Level: ${level}`, 10, 40)
+    // 等级显示（更明显）
+    ctx.fillStyle = '#ffd700'
+    ctx.font = 'bold 16px Arial'
+    ctx.fillText(`Lv.${level}`, 10, 40)
     
     // 经验条背景
     ctx.fillStyle = '#333'
-    ctx.fillRect(10, 50, 200, 10)
+    ctx.fillRect(10, 50, 200, 12)
     
     // 经验条
     ctx.fillStyle = '#0f0'
     const expPercent = exp / expMax
-    ctx.fillRect(10, 50, 200 * expPercent, 10)
+    ctx.fillRect(10, 50, 200 * expPercent, 12)
     
-    // 经验文本
+    // 经验条边框
+    ctx.strokeStyle = '#0f0'
+    ctx.lineWidth = 1
+    ctx.strokeRect(10, 50, 200, 12)
+    
+    // 经验文本（更明显）
     ctx.fillStyle = '#fff'
-    ctx.font = '10px Arial'
-    ctx.fillText(`${exp}/${expMax}`, 15, 58)
+    ctx.font = 'bold 11px Arial'
+    ctx.fillText(`EXP: ${exp}/${expMax}`, 15, 60)
     
     // 显示激活的技能
     ctx.font = '14px Arial'

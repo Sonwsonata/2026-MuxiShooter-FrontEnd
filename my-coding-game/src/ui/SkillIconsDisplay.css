@@ -1,0 +1,188 @@
+/* 技能图标显示 - FGO菱形风格 */
+
+.skill-icons-container {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  z-index: 100;
+}
+
+.skill-icon {
+  position: relative;
+  width: 60px;
+  height: 60px;
+}
+
+/* 菱形容器 */
+.skill-icon-diamond {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform: rotate(45deg);
+  background: linear-gradient(135deg, #2a2a3e 0%, #1a1a2e 100%);
+  border: 2px solid #444;
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.5),
+    inset 0 0 10px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+/* 空槽位 */
+.skill-icon.empty .skill-icon-diamond {
+  border-color: #333;
+  background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+}
+
+/* 激活状态 */
+.skill-icon.active .skill-icon-diamond {
+  border-color: #4af;
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.5),
+    0 0 15px rgba(74, 170, 255, 0.3),
+    inset 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+/* 就绪状态 */
+.skill-icon.ready .skill-icon-diamond {
+  border-color: #0f0;
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(0, 255, 0, 0.5),
+    inset 0 0 10px rgba(0, 0, 0, 0.3);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 
+      0 4px 8px rgba(0, 0, 0, 0.5),
+      0 0 20px rgba(0, 255, 0, 0.5),
+      inset 0 0 10px rgba(0, 0, 0, 0.3);
+  }
+  50% {
+    box-shadow: 
+      0 4px 8px rgba(0, 0, 0, 0.5),
+      0 0 30px rgba(0, 255, 0, 0.8),
+      inset 0 0 10px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* 内部内容 */
+.skill-icon-inner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-45deg);
+  width: 80%;
+  height: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.skill-icon-symbol {
+  font-size: 24px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.skill-icon.empty .skill-icon-symbol {
+  color: #555;
+  font-size: 28px;
+}
+
+.skill-icon.active .skill-icon-symbol {
+  color: #fff;
+}
+
+.skill-icon.ready .skill-icon-symbol {
+  color: #0f0;
+}
+
+/* 冷却遮罩 */
+.skill-cooldown-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.7);
+  transition: height 0.1s linear;
+  pointer-events: none;
+}
+
+/* 冷却时间文本 */
+.skill-cooldown-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-45deg);
+  font-size: 14px;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 
+    1px 1px 2px rgba(0, 0, 0, 0.8),
+    0 0 4px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* 槽位编号 */
+.skill-slot-number {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid #444;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  color: #888;
+}
+
+.skill-icon.active .skill-slot-number {
+  border-color: #4af;
+  color: #4af;
+}
+
+/* 悬停效果 */
+.skill-icon:hover .skill-icon-diamond {
+  transform: rotate(45deg) scale(1.1);
+}
+
+.skill-icon.active:hover .skill-icon-diamond {
+  border-color: #6cf;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.6),
+    0 0 25px rgba(74, 170, 255, 0.5),
+    inset 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .skill-icons-container {
+    top: 60px;
+    right: 10px;
+  }
+  
+  .skill-icon {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .skill-icon-symbol {
+    font-size: 20px;
+  }
+  
+  .skill-cooldown-text {
+    font-size: 12px;
+  }
+}

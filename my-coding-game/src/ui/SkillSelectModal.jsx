@@ -17,14 +17,17 @@ export default function SkillSelectModal() {
   }
 
   return (
-    <div className="skill-select-modal-overlay">
-      <div className="skill-select-modal">
-        <h2 className="modal-title">🎉 升级到 Lv.{level}！</h2>
-        <p className="modal-subtitle">选择一个技能或强化</p>
-        
-        <div className="skill-choices">
+    <div className="skill-select-overlay">
+      <div className="skill-select-container">
+        <div className="skill-select-header">
+          <h2 className="level-up-title">LEVEL UP</h2>
+          <div className="level-display">Lv.{level}</div>
+          <p className="skill-select-subtitle">选择技能或强化</p>
+        </div>
+
+        <div className="skill-options-grid">
           {levelUpChoices.map((option, index) => (
-            <SkillOption
+            <SkillCard
               key={index}
               option={option}
               onSelect={() => handleSelect(option)}
@@ -36,64 +39,89 @@ export default function SkillSelectModal() {
   )
 }
 
-function SkillOption({ option, onSelect }) {
+function SkillCard({ option, onSelect }) {
   const { type, tier, name, description } = option
 
-  // 根据类型和等级确定样式
   const getTierClass = () => {
-    if (type === 'new_skill') return 'tier-new'
-    return `tier-${tier}`
+    if (type === 'new_skill') return 'new'
+    return tier
   }
 
   const getTierLabel = () => {
-    if (type === 'new_skill') return '🆕 新技能'
+    if (type === 'new_skill') return 'NEW'
     
     const tierLabels = {
-      bronze: '🥉 铜色',
-      silver: '🥈 银色',
-      gold: '🥇 金色'
+      bronze: 'BRONZE',
+      silver: 'SILVER',
+      gold: 'GOLD'
     }
-    return tierLabels[tier] || '强化'
+    return tierLabels[tier] || 'UPGRADE'
   }
 
-  const getTitle = () => {
+  const getTierIcon = () => {
+    if (type === 'new_skill') return '★'
+    
+    const tierIcons = {
+      bronze: '◆',
+      silver: '◆',
+      gold: '◆'
+    }
+    return tierIcons[tier] || '◆'
+  }
+
+  const getCardTitle = () => {
     if (type === 'new_skill') {
       return name
     } else {
-      return `${option.skillName} - ${name}`
+      return name
     }
+  }
+
+  const getCardSubtitle = () => {
+    if (type === 'upgrade') {
+      return option.skillName
+    }
+    return null
   }
 
   return (
     <div 
-      className={`skill-card skill-${getTierClass()}`}
+      className={`skill-card tier-${getTierClass()}`}
       onClick={onSelect}
     >
-      <div className="skill-tier-badge">{getTierLabel()}</div>
+      <div className="skill-card-border"></div>
       
-      {type === 'upgrade' && (
-        <div className="skill-category">{option.skillName}</div>
-      )}
+      <div className="skill-card-header">
+        <div className="skill-tier-badge">
+          <span className="tier-icon">{getTierIcon()}</span>
+          <span className="tier-label">{getTierLabel()}</span>
+        </div>
+      </div>
 
-      <div className="skill-name">{getTitle()}</div>
-      
-      {description && (
-        <div className="skill-desc">{description}</div>
-      )}
+      <div className="skill-card-body">
+        {getCardSubtitle() && (
+          <div className="skill-category">{getCardSubtitle()}</div>
+        )}
+        <h3 className="skill-title">{getCardTitle()}</h3>
+        <p className="skill-description">{description}</p>
+      </div>
 
       {type === 'upgrade' && option.effect && (
-        <div className="skill-effect-preview">
-          {renderEffectPreview(option.effect)}
+        <div className="skill-effects">
+          {renderEffects(option.effect)}
         </div>
       )}
+
+      <div className="skill-card-footer">
+        <div className="select-hint">点击选择</div>
+      </div>
     </div>
   )
 }
 
-function renderEffectPreview(effect) {
+function renderEffects(effect) {
   const effects = []
   
-  // 解析效果
   if (effect.damageMultiplier) {
     const sign = effect.damageMultiplier > 0 ? '+' : ''
     effects.push(`伤害${sign}${(effect.damageMultiplier * 100).toFixed(0)}%`)
@@ -144,18 +172,14 @@ function renderEffectPreview(effect) {
   }
 
   if (effect.permanent) {
-    effects.push('⚡ 常驻')
+    effects.push('常驻效果')
   }
 
   if (effect.shots) {
-    effects.push(`×${effect.shots}`)
+    effects.push(`释放${effect.shots}次`)
   }
 
-  return (
-    <div className="effect-tags">
-      {effects.map((eff, i) => (
-        <span key={i} className="effect-tag">{eff}</span>
-      ))}
-    </div>
-  )
+  return effects.map((eff, i) => (
+    <span key={i} className="effect-item">{eff}</span>
+  ))
 }

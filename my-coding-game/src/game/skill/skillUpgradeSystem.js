@@ -23,14 +23,27 @@ export class SkillUpgradeSystem {
   getLevelUpOptions(count = 3) {
     const options = []
     
-    // 1. 获取新技能选项
-    const newSkillOptions = this.getNewSkillOptions()
+    // 检查已拥有的技能数量
+    const ownedSkillCount = Object.keys(this.ownedSkills).length
+    const maxSkills = 3 // 最多3个大类技能
+    
+    // 1. 获取新技能选项（如果还没达到上限）
+    let newSkillOptions = []
+    if (ownedSkillCount < maxSkills) {
+      newSkillOptions = this.getNewSkillOptions()
+    }
     
     // 2. 获取技能升级选项（已有技能的强化）
     const upgradeOptions = this.getSkillUpgradeOptions()
     
     // 3. 合并并随机选择
     const allOptions = [...newSkillOptions, ...upgradeOptions]
+    
+    // 如果没有可选项，返回空数组
+    if (allOptions.length === 0) {
+      console.warn('[SkillUpgrade] No available options')
+      return []
+    }
     
     // 随机打乱
     const shuffled = allOptions.sort(() => Math.random() - 0.5)

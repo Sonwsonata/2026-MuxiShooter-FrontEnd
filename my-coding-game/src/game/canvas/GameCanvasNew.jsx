@@ -9,7 +9,7 @@ const WIDTH = 360
 const HEIGHT = 640
 const DEFENSE_LINE = 520
 
-export default function GameCanvasNew() {
+export default function GameCanvasNew({ onCombatManagerReady }) {
   const canvasRef = useRef(null)
   const lastTimeRef = useRef(0)
   const waveControllerRef = useRef(null)
@@ -57,10 +57,15 @@ export default function GameCanvasNew() {
     // combatManagerRef.current.addSkill('laptop')
     // combatManagerRef.current.addSkill('takeout')
 
+    // 通知父组件combatManager已就绪
+    if (onCombatManagerReady) {
+      onCombatManagerReady(combatManagerRef.current)
+    }
+
     return () => {
       combatManagerRef.current?.cleanup()
     }
-  }, [])
+  }, [onCombatManagerReady])
 
   /* ================= 处理升级 ================= */
   // 升级后会显示技能选择界面，由 SkillSelectModal 组件处理

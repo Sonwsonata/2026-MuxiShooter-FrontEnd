@@ -1,163 +1,299 @@
-.skill-select-modal-overlay {
+/* FGO风格技能选择界面 */
+
+.skill-select-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.9);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  animation: fadeIn 0.3s ease;
 }
 
-.skill-select-modal {
-  background: #1a1a2e;
-  border: 2px solid #4af;
-  border-radius: 12px;
-  padding: 24px;
-  max-width: 500px;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.skill-select-container {
+  max-width: 900px;
   width: 90%;
-  box-shadow: 0 8px 32px rgba(74, 170, 255, 0.3);
+  padding: 40px 20px;
 }
 
-.modal-title {
-  color: #4af;
+/* 头部 */
+.skill-select-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.level-up-title {
+  font-size: 48px;
+  font-weight: bold;
+  color: #ffd700;
+  text-shadow: 
+    0 0 10px rgba(255, 215, 0, 0.8),
+    0 0 20px rgba(255, 215, 0, 0.6),
+    0 0 30px rgba(255, 215, 0, 0.4),
+    2px 2px 4px rgba(0, 0, 0, 0.8);
+  margin: 0 0 10px 0;
+  letter-spacing: 8px;
+  animation: glow 2s ease-in-out infinite;
+}
+
+@keyframes glow {
+  0%, 100% {
+    text-shadow: 
+      0 0 10px rgba(255, 215, 0, 0.8),
+      0 0 20px rgba(255, 215, 0, 0.6),
+      0 0 30px rgba(255, 215, 0, 0.4),
+      2px 2px 4px rgba(0, 0, 0, 0.8);
+  }
+  50% {
+    text-shadow: 
+      0 0 20px rgba(255, 215, 0, 1),
+      0 0 30px rgba(255, 215, 0, 0.8),
+      0 0 40px rgba(255, 215, 0, 0.6),
+      2px 2px 4px rgba(0, 0, 0, 0.8);
+  }
+}
+
+.level-display {
   font-size: 24px;
-  margin: 0 0 8px 0;
-  text-align: center;
+  color: #fff;
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 
-.modal-subtitle {
+.skill-select-subtitle {
+  font-size: 16px;
   color: #aaa;
-  font-size: 14px;
-  margin: 0 0 20px 0;
-  text-align: center;
+  margin: 0;
 }
 
-.skill-choices {
+/* 技能卡片网格 */
+.skill-options-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .skill-options-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 技能卡片 */
+.skill-card {
+  position: relative;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border: 3px solid;
+  border-radius: 8px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  min-height: 200px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
 }
 
-.skill-card {
-  background: #16213e;
-  border: 2px solid #333;
+.skill-card::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
   border-radius: 8px;
-  padding: 16px;
-  cursor: pointer;
-  transition: all 0.2s;
-  position: relative;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.skill-card:hover::before {
+  opacity: 1;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+  }
 }
 
 .skill-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
-.skill-tier-bronze {
+/* 不同等级的边框颜色 */
+.skill-card.tier-new {
+  border-color: #00ffff;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+}
+
+.skill-card.tier-new:hover {
+  border-color: #00ffff;
+  box-shadow: 0 0 25px rgba(0, 255, 255, 0.5);
+}
+
+.skill-card.tier-bronze {
   border-color: #cd7f32;
+  box-shadow: 0 0 15px rgba(205, 127, 50, 0.3);
 }
 
-.skill-tier-bronze:hover {
+.skill-card.tier-bronze:hover {
   border-color: #ff9f4a;
-  box-shadow: 0 4px 12px rgba(205, 127, 50, 0.4);
+  box-shadow: 0 0 25px rgba(205, 127, 50, 0.5);
 }
 
-.skill-tier-silver {
+.skill-card.tier-silver {
   border-color: #c0c0c0;
+  box-shadow: 0 0 15px rgba(192, 192, 192, 0.3);
 }
 
-.skill-tier-silver:hover {
+.skill-card.tier-silver:hover {
   border-color: #e0e0e0;
-  box-shadow: 0 4px 12px rgba(192, 192, 192, 0.4);
+  box-shadow: 0 0 25px rgba(192, 192, 192, 0.5);
 }
 
-.skill-tier-gold {
+.skill-card.tier-gold {
   border-color: #ffd700;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
 }
 
-.skill-tier-gold:hover {
+.skill-card.tier-gold:hover {
   border-color: #ffed4e;
-  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.5);
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
+}
+
+/* 卡片边框装饰 */
+.skill-card-border {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, currentColor, transparent);
+  opacity: 0.5;
+}
+
+/* 卡片头部 */
+.skill-card-header {
+  margin-bottom: 15px;
 }
 
 .skill-tier-badge {
-  position: absolute;
-  top: 8px;
-  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid currentColor;
+  border-radius: 20px;
   font-size: 12px;
   font-weight: bold;
-  padding: 2px 8px;
-  border-radius: 4px;
-  background: rgba(0, 0, 0, 0.5);
 }
 
-.skill-tier-bronze .skill-tier-badge {
+.tier-icon {
+  font-size: 14px;
+}
+
+.tier-new .skill-tier-badge {
+  color: #00ffff;
+  border-color: #00ffff;
+}
+
+.tier-bronze .skill-tier-badge {
   color: #ff9f4a;
+  border-color: #cd7f32;
 }
 
-.skill-tier-silver .skill-tier-badge {
+.tier-silver .skill-tier-badge {
   color: #e0e0e0;
+  border-color: #c0c0c0;
 }
 
-.skill-tier-gold .skill-tier-badge {
+.tier-gold .skill-tier-badge {
   color: #ffed4e;
+  border-color: #ffd700;
+}
+
+/* 卡片主体 */
+.skill-card-body {
+  flex: 1;
+  margin-bottom: 15px;
 }
 
 .skill-category {
-  color: #4af;
   font-size: 12px;
-  margin-bottom: 4px;
-}
-
-.skill-name {
-  color: #fff;
-  font-size: 18px;
-  font-weight: bold;
+  color: #888;
   margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-.skill-desc {
-  color: #aaa;
+.skill-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #fff;
+  margin: 0 0 10px 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.skill-description {
   font-size: 14px;
-  line-height: 1.4;
+  color: #ccc;
+  line-height: 1.5;
+  margin: 0;
 }
 
-/* 新技能样式 */
-.skill-tier-new {
-  border-color: #0ff;
-  background: linear-gradient(135deg, #16213e 0%, #1a2a4e 100%);
-}
-
-.skill-tier-new:hover {
-  border-color: #4ff;
-  box-shadow: 0 4px 12px rgba(0, 255, 255, 0.4);
-}
-
-.skill-tier-new .skill-tier-badge {
-  color: #0ff;
-}
-
-/* 效果预览 */
-.skill-effect-preview {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid #333;
-}
-
-.effect-tags {
+/* 效果列表 */
+.skill-effects {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  margin-bottom: 15px;
 }
 
-.effect-tag {
-  background: rgba(74, 170, 255, 0.2);
-  color: #4af;
+.effect-item {
   font-size: 11px;
-  padding: 2px 8px;
-  border-radius: 4px;
-  border: 1px solid rgba(74, 170, 255, 0.3);
+  padding: 3px 8px;
+  background: rgba(74, 170, 255, 0.2);
+  border: 1px solid rgba(74, 170, 255, 0.4);
+  border-radius: 12px;
+  color: #4af;
+  white-space: nowrap;
+}
+
+/* 卡片底部 */
+.skill-card-footer {
+  text-align: center;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.select-hint {
+  font-size: 12px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.skill-card:hover .select-hint {
+  color: #fff;
 }
